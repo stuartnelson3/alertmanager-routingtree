@@ -1,24 +1,18 @@
-
-// var width = 960,
-//     height = 500;
-
-var margin = {top: 20, right: 120, bottom: 20, left: 120},
- width = 960 - margin.right - margin.left,
- height = 500 - margin.top - margin.bottom;
-
-var color = d3.scale.category20();
+var margin = {top: 20, right: 120, bottom: 20, left: 120};
+var width = 960 - margin.right - margin.left;
+var height = 500 - margin.top - margin.bottom;
 
 var tree = d3.layout.tree()
- .size([height, width]);
+  .size([height, width]);
 
 var diagonal = d3.svg.diagonal()
- .projection(function(d) { return [d.y, d.x]; });
+  .projection(function(d) { return [d.y, d.x]; });
 
 var svg = d3.select("body").append("svg")
- .attr("width", width + margin.right + margin.left)
- .attr("height", height + margin.top + margin.bottom)
- .append("g")
- .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+  .attr("width", width + margin.right + margin.left)
+  .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+  .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 // Global for now so we can play with it from the console
 labelSet = {"service":"foo1"};
@@ -39,10 +33,9 @@ d3.select(".js-find-match").on("click", function() {
 // and returns the matching routing nodes.
 function match(root, labelSet) {
   // See if the node is a match. If it is, recurse through the children.
-	if (!matchLabels(root.matchers, labelSet)) {
-		return [];
-	}
-
+  if (!matchLabels(root.matchers, labelSet)) {
+    return [];
+  }
 
   var all = []
 
@@ -60,11 +53,11 @@ function match(root, labelSet) {
   }
 
   // If no child nodes were matches, the current node itself is a match.
-	if (all.length === 0) {
-		all.push(root);
-	}
+  if (all.length === 0) {
+    all.push(root);
+  }
 
-	return all
+  return all
 }
 
 function matchLabels(matchers, labelSet) {
@@ -87,8 +80,8 @@ function matchLabel(matcher, labelSet) {
 }
 
 d3.json("config.json", function(error, graph) {
-  //TODO: Current MarshalJSON is returning an {} for regex, get it to return a
-  //stringified form.
+  // TODO: Current MarshalJSON is returning an {} for regex, get it to return a
+  // stringified form.
   if (error) throw error;
 
   root = graph.data.Route;
@@ -136,51 +129,52 @@ function massage(root) {
   });
 }
 
-i = 0
 function update(root) {
-
+  var i = 0
   // Compute the new tree layout.
   var nodes = tree.nodes(root).reverse(),
-   links = tree.links(nodes);
+    links = tree.links(nodes);
 
-  // Normalize for fixed-depth.
-  nodes.forEach(function(d) { d.y = d.depth * 180; });
+    // Normalize for fixed-depth.
+    nodes.forEach(function(d) { d.y = d.depth * 180; });
 
-  // Declare the nodes.
-  var node = svg.selectAll("g.node")
-   .data(nodes, function(d) { return d.id || (d.id = ++i); });
+    // Declare the nodes.
+    var node = svg.selectAll("g.node")
+    .data(nodes, function(d) { return d.id || (d.id = ++i); });
 
-  // Enter the nodes.
-  var nodeEnter = node.enter().append("g")
-   .attr("class", "node")
-   .attr("transform", function(d) {
-    return "translate(" + d.y + "," + d.x + ")";
-   });
+    // Enter the nodes.
+    var nodeEnter = node.enter().append("g")
+      .attr("class", "node")
+      .attr("transform", function(d) {
+        return "translate(" + d.y + "," + d.x + ")";
+      });
 
-  nodeEnter.append("circle")
-   .attr("r", 10);
+    nodeEnter.append("circle").attr("r", 10);
 
-   node.select("circle").style("fill", function(d) {
-     return d.matched ? "yellow" : "steelblue";
-   });
+    node.select("circle").style("fill", function(d) {
+      return d.matched ? "yellow" : "steelblue";
+    });
 
-  nodeEnter.append("text")
-   .attr("x", function(d) {
-    return d.children || d._children ? -13 : 13; })
-   .attr("dy", ".35em")
-   .attr("text-anchor", function(d) {
-    return d.children || d._children ? "end" : "start"; })
-   .text(function(d) { return d.Receiver; })
-   .style("fill", "red")
-   .style("fill-opacity", 1);
+    nodeEnter.append("text")
+      .attr("x", function(d) {
+        return d.children || d._children ? -13 : 13;
+      })
+      .attr("dy", ".35em")
+      .attr("text-anchor", function(d) {
+        return d.children || d._children ? "end" : "start";
+      })
+      .text(function(d) {
+        return d.Receiver;
+      })
+      .style("fill", "red")
+      .style("fill-opacity", 1);
 
-  // Declare the links.
-  var link = svg.selectAll("path.link")
-   .data(links, function(d) { return d.target.id; });
+    // Declare the links.
+    var link = svg.selectAll("path.link")
+      .data(links, function(d) { return d.target.id; });
 
-  // Enter the links.
-  link.enter().insert("path", "g")
-   .attr("class", "link")
-   .attr("d", diagonal);
-
+    // Enter the links.
+    link.enter().insert("path", "g")
+      .attr("class", "link")
+      .attr("d", diagonal);
 }
