@@ -20,13 +20,16 @@ var svg = d3.select("body").append("svg")
  .append("g")
  .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
+// Global for now so we can play with it from the console
+labelSet = {"service":"foo1"};
 d3.select(".js-find-match").on("click", function() {
   var searchValue = document.querySelector("input").value
   // this needs to be an object of key-value pairs
-  labelSet = {"service":"files", "severity":"critical"};
+  // var labelSet = {"service":"files", "severity":"critical"};
   var matches = match(root, labelSet)
   var nodes = tree.nodes(root);
   var idx = nodes.map(function(n) { return n.id }).indexOf(matches[0].id)
+  nodes.forEach(function(n) { n.matched = false });
   nodes[idx].matched = true;
   update(root);
   // highlight the node that matches, maybe animate way through if possible
@@ -74,7 +77,6 @@ function matchLabels(matchers, labelSet) {
 }
 
 function matchLabel(matcher, labelSet) {
-  // TODO: need to parse labelset into k:v pairs
   var v = labelSet[matcher.name];
 
   if (matcher.isRegex) {
