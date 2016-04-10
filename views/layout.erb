@@ -27,7 +27,7 @@ body {
 
 textarea {
   border-color: #ddd;
-  height: 600px;
+  height: 760px;
   padding: 2px 0;
   width: 450px;
   font-family: monospace;
@@ -37,11 +37,15 @@ textarea {
   display: block;
 }
 
+.inline-block {
+  display: inline-block;
+}
+
 </style>
 <body>
 <script src="//d3js.org/d3.v3.min.js"></script>
 <script src="js-yaml.min.js"></script>
-<div>
+<div class="inline-block">
   <div>
     <label class="block">copy and paste your config.yml:</label>
     <textarea class="js-config-yml" cols="50" rows="10"></textarea>
@@ -49,8 +53,10 @@ textarea {
   </div>
   <div>
     <input class="label-input" type="text" placeholder='{service="foo-service", severity="critical"}' \>
-    <button type="button" class="js-find-match">find match</button>
+    <button type="button" class="js-find-match block">find match</button>
   </div>
+</div>
+<div class="js-svg inline-block">
 </div>
 <script src="script.js"></script>
 </body>

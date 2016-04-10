@@ -34,8 +34,8 @@ function parseSearch(searchString) {
 }
 
 function resetSVG() {
-  d3.select("svg").remove()
-  svg = d3.select("body").append("svg")
+  d3.select(".js-svg svg").remove()
+  svg = d3.select(".js-svg").append("svg")
     .attr("width", diameter)
     .attr("height", diameter - 150)
     .append("g")
