@@ -160,12 +160,33 @@ function update(root) {
   var nodes = tree.nodes(root);
   var links = tree.links(nodes);
 
-  var link = svg.selectAll(".link")
-      .data(links)
-    .enter().append("path")
-      .attr("class", "link")
-      .attr("d", diagonal);
+  var matchedNode = nodes.find(function(n) { return n.matched })
+  var highlight = [];
+  if (matchedNode) {
+    highlight = [matchedNode]
+    while (matchedNode.parent) {
+      highlight.push(matchedNode.parent);
+      matchedNode = matchedNode.parent;
+    }
+  }
 
+  var link = svg.selectAll(".link").data(links);
+
+  link.enter().append("path")
+    .attr("class", "link")
+    .attr("d", diagonal);
+
+  if (highlight.length) {
+    link.style("stroke", function(d) {
+      if (highlight.indexOf(d.source) > -1 && highlight.indexOf(d.target) > -1) {
+        return "steelblue"
+      }
+      return "#ccc"
+    });
+  }
+
+// maybe i can find the "matched" nodes, track their parents, and then get the
+// links for them and then animate those to be blue
   var node = svg.selectAll(".node")
       .data(nodes, function(d) { return d.id || (d.id = ++i); });
 
