@@ -37,12 +37,15 @@ function parseSearch(searchString) {
 d3.select(".js-parse-and-draw").on("click", function() {
   var config = document.querySelector(".js-config-yml").value;
   var parsedConfig = jsyaml.load(config);
+
+  // Create a new SVG for each time a config is loaded.
   d3.select("svg").remove()
   svg = d3.select("body").append("svg")
     .attr("width", diameter)
     .attr("height", diameter - 150)
     .append("g")
     .attr("transform", "translate(" + diameter / 2 + "," + (diameter / 2 - 100) + ")");
+
   loadConfig(parsedConfig);
 });
 
@@ -194,8 +197,6 @@ function update(root) {
     });
   }
 
-// maybe i can find the "matched" nodes, track their parents, and then get the
-// links for them and then animate those to be blue
   var node = svg.selectAll(".node")
     .data(nodes, function(d) { return d.id || (d.id = ++i); });
 
