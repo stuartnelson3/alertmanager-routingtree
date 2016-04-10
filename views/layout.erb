@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <style>
+body {
+  font: 12px sans-serif;
+}
 
 .node circle {
   stroke: steelblue;
@@ -18,16 +21,36 @@
 }
 
 .label-input {
-  width: 450px;
   padding: 2px 0;
+  width: 450px;
+}
+
+textarea {
+  border-color: #ddd;
+  height: 600px;
+  padding: 2px 0;
+  width: 450px;
+  font-family: monospace;
+}
+
+.block {
+  display: block;
 }
 
 </style>
 <body>
 <script src="//d3js.org/d3.v3.min.js"></script>
+<script src="js-yaml.min.js"></script>
 <div>
-  <input class="label-input" type="text" placeholder='{service="foo-service", severity="critical"}' \>
-  <button type="button" class="js-find-match">find match</button>
+  <div>
+    <label class="block">copy and paste your config.yml:</label>
+    <textarea class="js-config-yml" cols="50" rows="10"></textarea>
+    <button type="button" class="js-parse-and-draw block">draw tree</button>
+  </div>
+  <div>
+    <input class="label-input" type="text" placeholder='{service="foo-service", severity="critical"}' \>
+    <button type="button" class="js-find-match">find match</button>
+  </div>
 </div>
 <script src="script.js"></script>
 </body>

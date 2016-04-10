@@ -10,11 +10,7 @@ var tree = d3.layout.tree()
 var diagonal = d3.svg.diagonal.radial()
     .projection(function(d) { return [d.y, d.x / 180 * Math.PI]; });
 
-var svg = d3.select("body").append("svg")
-    .attr("width", diameter)
-    .attr("height", diameter - 150)
-  .append("g")
-    .attr("transform", "translate(" + diameter / 2 + "," + (diameter / 2 - 100) + ")");
+var svg;
 
 var tooltip = d3.select("body")
     .append("div")
@@ -36,6 +32,19 @@ function parseSearch(searchString) {
   });
   return o;
 }
+
+// Click handler for reading config.yml
+d3.select(".js-parse-and-draw").on("click", function() {
+  var config = document.querySelector(".js-config-yml").value;
+  var parsedConfig = jsyaml.load(config);
+  d3.select("svg").remove()
+  svg = d3.select("body").append("svg")
+    .attr("width", diameter)
+    .attr("height", diameter - 150)
+    .append("g")
+    .attr("transform", "translate(" + diameter / 2 + "," + (diameter / 2 - 100) + ")");
+  loadConfig(parsedConfig);
+});
 
 // Click handler for input labelSet
 d3.select(".js-find-match").on("click", function() {
@@ -67,7 +76,7 @@ function match(root, labelSet) {
 
       all = all.concat(matches);
 
-      if (matches && !child.Continue) {
+      if (matches && !child.continue) {
         break;
       }
     }
@@ -102,43 +111,43 @@ function matchLabel(matcher, labelSet) {
   return matcher.value === v;
 }
 
-// Load config.json, the json version of an AlertManager config.yml
-d3.json("config.json", function(error, graph) {
-  // TODO: Current MarshalJSON is returning an {} for regex, get it to return a
-  // stringified form.
-  if (error) throw error;
-
-  root = graph.data.Route;
+// Load the parsed config and create the tree
+function loadConfig(config) {
+  root = config.route;
 
   root.parent = null;
   massage(root)
 
   update(root);
-});
+}
 
 // Translate AlertManager names to expected d3 tree names, convert AlertManager
 // Match and MatchRE objects to js objects.
 function massage(root) {
   if (!root) return;
 
-  root.children = root.Routes
+  root.children = root.routes
+
+  if (root.continue != false) {
+    root.continue = true;
+  }
 
   var matchers = []
-  if (root.Match) {
-    for (var key in root.Match) {
+  if (root.match) {
+    for (var key in root.match) {
       var o = {};
       o.isRegex = false;
-      o.value = root.Match[key];
+      o.value = root.match[key];
       o.name = key;
       matchers.push(o);
     }
   }
 
-  if (root.MatchRE) {
-    for (var key in root.MatchRE) {
+  if (root.match_re) {
+    for (var key in root.match_re) {
       var o = {};
       o.isRegex = true;
-      o.value = new RegExp(root.MatchRE[key]);
+      o.value = new RegExp(root.match_re[key]);
       o.name = key;
       matchers.push(o);
     }
@@ -188,7 +197,7 @@ function update(root) {
 // maybe i can find the "matched" nodes, track their parents, and then get the
 // links for them and then animate those to be blue
   var node = svg.selectAll(".node")
-      .data(nodes, function(d) { return d.id || (d.id = ++i); });
+    .data(nodes, function(d) { return d.id || (d.id = ++i); });
 
   var nodeEnter = node.enter().append("g")
     .attr("class", "node")
@@ -203,7 +212,7 @@ function update(root) {
       .attr("dy", ".31em")
       .attr("text-anchor", function(d) { return d.x < 180 ? "start" : "end"; })
       .attr("transform", function(d) { return d.x < 180 ? "translate(8)" : "rotate(180)translate(-8)"; })
-      .text(function(d) { return d.Receiver; });
+      .text(function(d) { return d.receiver; });
 
   node.select(".node circle").style("fill", function(d) {
     return d.matched ? "steelblue" : "#fff";
