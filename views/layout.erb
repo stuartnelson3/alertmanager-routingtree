@@ -8,21 +8,26 @@
 }
 
 .node text {
- font: 10px sans-serif;
+  font: 10px sans-serif;
 }
 
 .link {
- fill: none;
- stroke: #ccc;
- stroke-width: 1.5px;
+  fill: none;
+  stroke: #ccc;
+  stroke-width: 1.5px;
+}
+
+.label-input {
+  width: 450px;
+  padding: 2px 0;
 }
 
 </style>
 <body>
 <script src="//d3js.org/d3.v3.min.js"></script>
 <div>
-<input type="text" \>
-<button type="button" class="js-find-match">find match</button>
+  <input class="label-input" type="text" placeholder='{service="foo-service", severity="critical"}' \>
+  <button type="button" class="js-find-match">find match</button>
 </div>
 <script src="script.js"></script>
 </body>

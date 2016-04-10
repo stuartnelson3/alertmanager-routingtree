@@ -27,20 +27,27 @@ var tooltip = d3.select("body")
     .style("visibility", "hidden");
 
 // Global for now so we can play with it from the console
-labelSet = {"service":"mysql"};
+function parseSearch(searchString) {
+  labels = searchString.replace(/{|}|\"|\s/g, "").split(",");
+  var o = {};
+  labels.forEach(function(label) {
+    l = label.split("=");
+    o[l[0]] = l[1];
+  });
+  return o;
+}
 
 // Click handler for input labelSet
 d3.select(".js-find-match").on("click", function() {
   var searchValue = document.querySelector("input").value
-  // this needs to be an object of key-value pairs
-  // var labelSet = {"service":"files", "severity":"critical"};
+  labelSet = parseSearch(searchValue);
   var matches = match(root, labelSet)
   var nodes = tree.nodes(root);
   var idx = nodes.map(function(n) { return n.id }).indexOf(matches[0].id)
   nodes.forEach(function(n) { n.matched = false });
   nodes[idx].matched = true;
   update(root);
-  // highlight the node that matches, maybe animate way through if possible
+  // Animate path to node?
 });
 
 // Match does a depth-first left-to-right search through the route tree
