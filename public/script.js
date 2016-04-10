@@ -183,7 +183,9 @@ function update(root) {
   .on("mouseover", function(d) {
     d3.select(this).style("fill", "steelblue");
 
-    text = formatMatcherText(d.matchers);
+    // Show all matchers for node and ancestors
+    matchers = aggregateMatchers(d);
+    text = formatMatcherText(matchers);
     text.forEach(function(t) {
       tooltip.append("div").text(t);
     });
@@ -205,4 +207,14 @@ function formatMatcherText(matchersArray) {
   return matchersArray.map(function(m) {
     return m.name + ": " + m.value;
   });
+}
+
+function aggregateMatchers(node) {
+  var n = node
+  matchers = [];
+  while (n.parent) {
+    matchers = matchers.concat(n.matchers);
+    n = n.parent;
+  }
+  return matchers
 }
