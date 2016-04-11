@@ -24,10 +24,10 @@ var tooltip = d3.select("body")
 
 // Global for now so we can play with it from the console
 function parseSearch(searchString) {
-  labels = searchString.replace(/{|}|\"|\s/g, "").split(",");
+  var labels = searchString.replace(/{|}|\"|\s/g, "").split(",");
   var o = {};
   labels.forEach(function(label) {
-    l = label.split("=");
+    var l = label.split("=");
     o[l[0]] = l[1];
   });
   return o;
@@ -55,7 +55,7 @@ d3.select(".js-parse-and-draw").on("click", function() {
 // Click handler for input labelSet
 d3.select(".js-find-match").on("click", function() {
   var searchValue = document.querySelector("input").value
-  labelSet = parseSearch(searchValue);
+  var labelSet = parseSearch(searchValue);
   var matches = match(root, labelSet)
   var nodes = tree.nodes(root);
   var idx = nodes.map(function(n) { return n.id }).indexOf(matches[0].id)
