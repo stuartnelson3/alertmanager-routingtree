@@ -27,7 +27,7 @@ body {
 
 textarea {
   border-color: #ddd;
-  height: 760px;
+  height: 480px;
   padding: 2px 0;
   width: 450px;
   font-family: monospace;
@@ -45,15 +45,20 @@ textarea {
 <body>
 <script src="//d3js.org/d3.v3.min.js"></script>
 <script src="js-yaml.min.js"></script>
-<div class="inline-block">
-  <div>
-    <label class="block">copy and paste your config.yml:</label>
-    <textarea class="js-config-yml" cols="50" rows="10"></textarea>
-    <button type="button" class="js-parse-and-draw block">draw tree</button>
-  </div>
-  <div>
-    <input class="label-input" type="text" placeholder='{service="foo-service", severity="critical"}' \>
-    <button type="button" class="js-find-match block">find match</button>
+<div class="container">
+  <h1 id="routing-tree-editor" class="page-header">
+    Routing tree editor
+  </h1>
+  <div class="inline-block">
+    <div>
+      <label class="block">copy and paste your config.yml:</label>
+      <textarea class="js-config-yml" cols="30" rows="10"></textarea>
+      <button type="button" class="js-parse-and-draw block">draw tree</button>
+    </div>
+    <div>
+      <input class="label-input js-label-set-input" type="text" placeholder='{service="foo-service", severity="critical"}' \>
+      <button type="button" class="js-find-match block">find match</button>
+    </div>
   </div>
 </div>
 <div class="js-svg inline-block">

@@ -1,7 +1,10 @@
 // Setup
 
 // Modify the diameter to expand/contract space between nodes.
-var diameter = 960;
+var anchor = document.querySelector(".page-header").parentElement;
+var diameter = anchor.clientWidth;
+
+var color = "#e6522c";
 
 var tree = d3.layout.tree()
     .size([360, diameter / 2 - 120])
@@ -22,7 +25,6 @@ var tooltip = d3.select("body")
     .style("z-index", "10")
     .style("visibility", "hidden");
 
-// Global for now so we can play with it from the console
 function parseSearch(searchString) {
   var labels = searchString.replace(/{|}|\"|\s/g, "").split(",");
   var o = {};
@@ -34,12 +36,13 @@ function parseSearch(searchString) {
 }
 
 function resetSVG() {
-  d3.select(".js-svg svg").remove()
-  svg = d3.select(".js-svg").append("svg")
+  d3.select(anchor).select("svg").remove()
+  svg = d3.select(anchor).append("svg")
+    .classed("routing-table", true)
     .attr("width", diameter)
     .attr("height", diameter - 150)
     .append("g")
-    .attr("transform", "translate(" + diameter / 2 + "," + (diameter / 2 - 100) + ")");
+    .attr("transform", "translate(" + diameter / 2 + "," + (diameter / 2 - 200) + ")");
 }
 
 // Click handler for reading config.yml
@@ -54,7 +57,18 @@ d3.select(".js-parse-and-draw").on("click", function() {
 
 // Click handler for input labelSet
 d3.select(".js-find-match").on("click", function() {
-  var searchValue = document.querySelector("input").value
+  labelServiceHandler();
+});
+
+d3.select(document).on("keyup", function(e) {
+  if (d3.event.keyCode != 13) {
+    return;
+  }
+  labelServiceHandler();
+});
+
+function labelServiceHandler() {
+  var searchValue = document.querySelector(".js-label-set-input").value
   var labelSet = parseSearch(searchValue);
   var matches = match(root, labelSet)
   var nodes = tree.nodes(root);
@@ -62,8 +76,7 @@ d3.select(".js-find-match").on("click", function() {
   nodes.forEach(function(n) { n.matched = false });
   nodes[idx].matched = true;
   update(root);
-  // Animate path to node?
-});
+}
 
 // Match does a depth-first left-to-right search through the route tree
 // and returns the matching routing nodes.
@@ -187,6 +200,15 @@ function update(root) {
 
   var link = svg.selectAll(".link").data(links);
 
+  var drawSimple = nodes.length < 3 ? true : false;
+  if (drawSimple) {
+    // Algorithm fails to assign x attributes if nodes.length < 3. For this
+    // simple case, manually assign values.
+    nodes.forEach(function(n, i) {
+      n.x = i * 180 + 90;
+    });
+  }
+
   link.enter().append("path")
     .attr("class", "link")
     .attr("d", diagonal);
@@ -194,7 +216,7 @@ function update(root) {
   if (highlight.length) {
     link.style("stroke", function(d) {
       if (highlight.indexOf(d.source) > -1 && highlight.indexOf(d.target) > -1) {
-        return "steelblue"
+        return color
       }
       return "#ccc"
     });
@@ -210,23 +232,23 @@ function update(root) {
     })
 
   nodeEnter.append("circle")
-      .attr("r", 4.5);
+    .attr("r", 4.5);
 
   nodeEnter.append("text")
-      .attr("dy", ".31em")
-      .attr("text-anchor", function(d) { return d.x < 180 ? "start" : "end"; })
-      .attr("transform", function(d) { return d.x < 180 ? "translate(8)" : "rotate(180)translate(-8)"; })
-      .text(function(d) { return d.receiver; });
+    .attr("dy", ".31em")
+    .attr("text-anchor", function(d) { return d.x < 180 ? "start" : "end"; })
+    .attr("transform", function(d) { return d.x < 180 ? "translate(8)" : "rotate(180)translate(-8)"; })
+    .text(function(d) { return d.receiver; });
 
   node.select(".node circle").style("fill", function(d) {
-    return d.matched ? "steelblue" : "#fff";
+    return d.matched ? color : "#fff";
   })
-  .on("mouseover", function(d) {
-    d3.select(this).style("fill", "steelblue");
+    .on("mouseover", function(d) {
+      d3.select(this).style("fill", color);
 
-    // Show all matchers for node and ancestors
-    matchers = aggregateMatchers(d);
-    text = formatMatcherText(matchers);
+      // Show all matchers for node and ancestors
+      matchers = aggregateMatchers(d);
+      text = formatMatcherText(matchers);
     text.forEach(function(t) {
       tooltip.append("div").text(t);
     });
@@ -238,7 +260,7 @@ function update(root) {
     return tooltip.style("top", (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");
   })
   .on("mouseout", function(d) {
-    d3.select(this).style("fill", d.matched ? "steelblue" : "#fff");
+    d3.select(this).style("fill", d.matched ? color : "#fff");
     tooltip.text("");
     return tooltip.style("visibility", "hidden");
   });
